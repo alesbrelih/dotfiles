@@ -125,6 +125,7 @@ PATH="/opt/homebrew/bin/python3:$PATH"
 
 alias n="nvim"
 alias k="kubectl"
+alias ts='tmuxinator start $(tmuxinator list | grep -v projects: | fzf)'
 export BAT_THEME="Catppuccin-frappe"
 
 # alias zc='zellij -l /Users/ales/.config/zellij/layouts/$(ls /Users/ales/.config/zellij/layouts | fzf)'
