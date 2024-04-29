@@ -23,6 +23,7 @@ return {
         map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
         map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
         map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+        map('<leader>cd', vim.diagnostic.open_float, 'Line Diagnostics')
         map('K', vim.lsp.buf.hover, 'Hover Documentation')
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
@@ -123,6 +124,13 @@ return {
               url = '',
             },
           },
+        },
+      },
+      gitlab_ci_ls = {
+        cmd = { '/Users/ales/personal/gitlab-lsp/target/debug/gitlab-ci-ls' },
+        init_options = {
+          cache = '~/.cache/gitlab-ci-ls/',
+          log_path = '~/.cache/gitlab-ci-ls/log/gitlab-ci-ls.log',
         },
       },
       dockerls = {},
