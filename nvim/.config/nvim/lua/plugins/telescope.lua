@@ -26,6 +26,11 @@ return {
           require('telescope.themes').get_dropdown(),
         },
       },
+      defaults = {
+        path_display = {
+          truncate = 2,
+        },
+      },
     }
 
     pcall(require('telescope').load_extension, 'fzf')

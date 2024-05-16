@@ -125,7 +125,8 @@ PATH="/opt/homebrew/bin/python3:$PATH"
 
 alias n="nvim"
 alias k="kubectl"
-alias ts='tmuxinator start $(tmuxinator list | grep -v projects: | fzf)'
+alias tc='tmuxinator start $(tmuxinator list | grep -v projects: | tr " " "\n" | awk NF | fzf)'
+alias ta='tmux a'
 export BAT_THEME="Catppuccin-frappe"
 
 # alias zc='zellij -l /Users/ales/.config/zellij/layouts/$(ls /Users/ales/.config/zellij/layouts | fzf)'
@@ -134,3 +135,5 @@ export BAT_THEME="Catppuccin-frappe"
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"
+export PATH="/Users/ales/.local/bin:$PATH"
