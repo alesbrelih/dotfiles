@@ -14,6 +14,7 @@ config.font = wezterm.font_with_fallback({
 	"Maple Mono",
 	"Nerd Font Symbols",
 })
+
 config.font_size = 13
 config.use_fancy_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = true
