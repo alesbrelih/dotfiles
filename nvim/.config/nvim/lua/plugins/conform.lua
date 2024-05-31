@@ -39,8 +39,6 @@ return {
     notify_on_error = false,
     format_on_save = function(bufnr)
       -- add ability to disable autoformat
-      print(vim.inspect(vim.g.disable_autoformat))
-      print(vim.inspect(vim.b[bufnr].disable_autoformat))
       if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
         return
       end
