@@ -1,6 +1,7 @@
 return {
   'folke/trouble.nvim',
-  branch = 'dev', -- IMPORTANT!
+  opts = {}, -- for default options, refer to the configuration section for custom setup.
+  cmd = 'Trouble',
   keys = {
     {
       '<leader>xx',
@@ -11,11 +12,6 @@ return {
       '<leader>xX',
       '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
       desc = 'Buffer Diagnostics (Trouble)',
-    },
-    {
-      '<leader>cs',
-      '<cmd>Trouble symbols toggle focus=false<cr>',
-      desc = 'Symbols (Trouble)',
     },
     {
       '<leader>cl',
@@ -33,5 +29,4 @@ return {
       desc = 'Quickfix List (Trouble)',
     },
   },
-  opts = {}, -- for default options, refer to the configuration section for custom setup.
 }

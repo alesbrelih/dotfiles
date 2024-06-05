@@ -100,15 +100,14 @@ return {
   },
   {
     'nvim-treesitter/nvim-treesitter-context',
-    enabled = true,
-    opts = { mode = 'cursor', max_lines = 3 },
-    keys = {
-      {
-        '<leader>utc',
-        '<cmd>TSContextToggle<cr>',
-        mode = 'n',
-        desc = '[U]I [T]reesitter [C]ontext',
-      },
+    opts = { enabled = true, mode = 'cursor', max_lines = 3 },
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
     },
+
+    config = function(_, opts)
+      require('treesitter-context').setup(opts)
+      vim.keymap.set('n', '<leader>utc', '<cmd>TSContextToggle<cr>', { desc = 'I [T]reesitter [C]ontext' })
+    end,
   },
 }
