@@ -9,6 +9,7 @@ return {
       flavour = 'frappe',
       integrations = {
         cmp = true,
+        leap = true,
         mason = true,
         fidget = true,
         markdown = true,

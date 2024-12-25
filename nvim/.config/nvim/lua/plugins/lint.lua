@@ -8,8 +8,8 @@ return {
       lint.linters_by_ft = {
         markdown = { 'markdownlint' },
         dockerfile = { 'hadolint' },
-        javascript = { 'eslint' },
-        typescript = { 'eslint' },
+        -- javascript = { 'eslint' },
+        -- typescript = { 'eslint' },
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
@@ -33,8 +33,8 @@ return {
       -- }
       --
       -- You can disable the default linters by setting their filetypes to nil:
-      -- lint.linters_by_ft['clojure'] = nil
-      -- lint.linters_by_ft['dockerfile'] = nil
+      lint.linters_by_ft['javascript'] = nil
+      lint.linters_by_ft['typescript'] = nil
       -- lint.linters_by_ft['inko'] = nil
       -- lint.linters_by_ft['janet'] = nil
       -- lint.linters_by_ft['json'] = nil
