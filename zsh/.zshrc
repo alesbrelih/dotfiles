@@ -122,6 +122,7 @@ fi
 export GPG_TTY=$(tty)
 PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
 PATH="/opt/homebrew/bin/python3:$PATH"
+PATH="/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH"
 
 alias n="nvim"
 alias k="kubectl"
@@ -134,6 +135,10 @@ export BAT_THEME="Catppuccin-frappe"
 
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 export PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"
 export PATH="/Users/ales/.local/bin:$PATH"
