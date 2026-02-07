@@ -49,7 +49,13 @@ fi
 
 rm -rf "$TEMP_DIR"
 
-# 4. Stow Configurations
+# 4. Setup Tmux Plugin Manager (TPM)
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    echo "[-] Installing Tmux Plugin Manager..."
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+
+# 5. Stow Configurations
 DOTFILES_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 cd "$DOTFILES_DIR"
 
