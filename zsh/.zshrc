@@ -129,16 +129,34 @@ alias k="kubectl"
 alias tc='tmuxinator start $(tmuxinator list | grep -v projects: | tr " " "\n" | awk NF | fzf)'
 alias ta='tmux a'
 export BAT_THEME="Catppuccin-frappe"
-
 # alias zc='zellij -l /Users/ales/.config/zellij/layouts/$(ls /Users/ales/.config/zellij/layouts | fzf)'
 # alias za='zellij attach $(zellij list-sessions -s | fzf)'
 
+eval "$(direnv hook zsh)"
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
-export PYENV_ROOT="$HOME/.pyenv"
+eval "$(mise activate zsh)"
+eval "$(fnox activate zsh)"
+#export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+#eval "$(pyenv init -)"
+#eval "$(pyenv virtualenv-init -)"
 export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
 export PATH="/opt/homebrew/opt/findutils/libexec/gnubin:$PATH"
 export PATH="/Users/ales/.local/bin:$PATH"
+export PATH="/Users/ales/go/bin:$PATH"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/ales/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/ales/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/ales/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/ales/google-cloud-sdk/completion.zsh.inc'; fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# bun completions
+[ -s "/Users/ales/.bun/_bun" ] && source "/Users/ales/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"

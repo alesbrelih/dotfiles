@@ -1,8 +1,8 @@
 return {
   'neovim/nvim-lspconfig',
   dependencies = {
-    { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-    'williamboman/mason-lspconfig.nvim',
+    { 'mason-org/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
+    'mason-org/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     { 'j-hui/fidget.nvim', opts = {} },
     { 'folke/neodev.nvim', opts = {} },
@@ -63,6 +63,8 @@ return {
 
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+    local util = require 'lspconfig.util'
 
     local servers = {
       taplo = {
@@ -130,6 +132,7 @@ return {
       },
       gitlab_ci_ls = {
         cmd = { '/Users/ales/personal/gitlab-lsp/target/debug/gitlab-ci-ls' },
+        root_dir = util.root_pattern('.git', '.gitlab*'),
         init_options = {
           cache = '~/.cache/gitlab-ci-ls/',
           log_path = '~/.cache/gitlab-ci-ls/log/gitlab-ci-ls.log',
@@ -196,7 +199,7 @@ return {
     }
 
     require('mason').setup()
-
+    --
     local ensure_installed = vim.tbl_keys(servers or {})
     vim.list_extend(ensure_installed, {
       'stylua', -- Used to format Lua code
@@ -213,14 +216,22 @@ return {
 
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+    print 'WHAT'
     require('mason-lspconfig').setup {
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end,
-      },
+      ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+      automatic_installation = true,
     }
+
+    local lspconfig = require 'lspconfig'
+    for name, config in pairs(servers) do
+      if config == true then
+        config = {}
+      end
+      config = vim.tbl_deep_extend('force', {}, {
+        capabilities = capabilities,
+      }, config)
+
+      lspconfig[name].setup(config)
+    end
   end,
 }
