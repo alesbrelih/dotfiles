@@ -20,7 +20,7 @@ echo "[-] Detected architecture: $ARCH"
 echo "[-] Updating package lists..."
 sudo apt-get update
 echo "[-] Installing tmux, stow, alacritty, curl, git, and build dependencies..."
-sudo apt-get install -y tmux stow alacritty curl git tar build-essential
+sudo apt-get install -y tmux stow alacritty curl git tar build-essential spice-vdagent qemu-guest-agent
 
 # 3. Install Latest Neovim
 echo "[-] Installing latest Neovim for $ARCH..."
