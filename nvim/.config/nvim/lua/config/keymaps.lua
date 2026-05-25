@@ -56,13 +56,6 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 vim.keymap.set('n', 'Y', 'y$', { desc = 'Copy to end' })
 
-vim.keymap.set('n', '<A-j>', '<cmd>m .+1<cr>==', { desc = 'Move down' })
-vim.keymap.set('n', '<A-k>', '<cmd>m .-2<cr>==', { desc = 'Move up' })
-vim.keymap.set('i', '<A-j>', '<esc><cmd>m .+1<cr>==gi', { desc = 'Move down' })
-vim.keymap.set('i', '<A-k>', '<esc><cmd>m .-2<cr>==gi', { desc = 'Move up' })
-vim.keymap.set('v', '<A-j>', ":m '>+1<cr>gv=gv", { desc = 'Move down' })
-vim.keymap.set('v', '<A-k>', ":m '<-2<cr>gv=gv", { desc = 'Move up' })
-
 -- keeping it centered
 vim.keymap.set('n', 'n', 'nzzzv')
 vim.keymap.set('n', 'N', 'Nzzzv')
@@ -70,14 +63,6 @@ vim.keymap.set('n', 'J', 'mzJ`z')
 
 -- escape
 vim.keymap.set('i', '<c-c>', '<Esc>')
-
--- additional breakpoints
-vim.keymap.set('i', ',', ',<c-g>u')
-vim.keymap.set('i', '.', '.<c-g>u')
-vim.keymap.set('i', ';', ';<c-g>u')
-vim.keymap.set('i', '!', '!<c-g>u')
-vim.keymap.set('i', '?', '?<c-g>u')
-vim.keymap.set('i', '=', '=<c-g>u')
 
 -- reselect original text when pasting in visual mode
 vim.keymap.set('x', 'p', 'pgvy')

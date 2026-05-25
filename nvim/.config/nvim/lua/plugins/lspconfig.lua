@@ -1,11 +1,11 @@
 return {
   'neovim/nvim-lspconfig',
   dependencies = {
-    { 'mason-org/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
+    { 'mason-org/mason.nvim', config = true },
     'mason-org/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
     { 'j-hui/fidget.nvim', opts = {} },
-    { 'folke/neodev.nvim', opts = {} },
+    { 'folke/lazydev.nvim', opts = {} },
   },
   config = function()
     vim.api.nvim_create_autocmd('LspAttach', {
@@ -27,7 +27,21 @@ return {
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
         local client = vim.lsp.get_client_by_id(event.data.client_id)
-        if client and client.server_capabilities.documentHighlightProvider then
+        if not client then
+          return
+        end
+
+        if client.name == 'taplo' then
+          vim.keymap.set('n', 'K', function()
+            if vim.fn.expand '%:t' == 'Cargo.toml' and require('crates').popup_available() then
+              require('crates').show_popup()
+            else
+              vim.lsp.buf.hover()
+            end
+          end, { buffer = event.buf, desc = 'Show Crate Documentation' })
+        end
+
+        if client.server_capabilities.documentHighlightProvider then
           local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
             buffer = event.buf,
@@ -42,7 +56,7 @@ return {
           })
         end
 
-        if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+        if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
           map('<leader>uh', function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
           end, '[T]oggle Inlay [H]ints')
@@ -64,145 +78,119 @@ return {
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-    local util = require 'lspconfig.util'
+    vim.lsp.config('*', {
+      capabilities = capabilities,
+    })
 
-    local servers = {
-      taplo = {
-        keys = {
-          {
-            'K',
-            function()
-              if vim.fn.expand '%:t' == 'Cargo.toml' and require('crates').popup_available() then
-                require('crates').show_popup()
-              else
-                vim.lsp.buf.hover()
-              end
-            end,
-            desc = 'Show Crate Documentation',
+    vim.lsp.config('jsonls', {
+      on_new_config = function(new_config)
+        new_config.settings.json.schemas = new_config.settings.json.schemas or {}
+        vim.list_extend(new_config.settings.json.schemas, require('schemastore').json.schemas())
+      end,
+      settings = {
+        json = {
+          format = { enable = true },
+          validate = { enable = true },
+        },
+      },
+    })
+
+    vim.lsp.config('yamlls', {
+      capabilities = {
+        textDocument = {
+          foldingRange = {
+            dynamicRegistration = false,
+            lineFoldingOnly = true,
           },
         },
       },
-      marksman = {},
-      jsonls = {
-        -- lazy-load schemastore when needed
-        on_new_config = function(new_config)
-          new_config.settings.json.schemas = new_config.settings.json.schemas or {}
-          vim.list_extend(new_config.settings.json.schemas, require('schemastore').json.schemas())
-        end,
-        settings = {
-          json = {
-            format = {
-              enable = true,
-            },
-            validate = { enable = true },
+      on_new_config = function(new_config)
+        new_config.settings.yaml.schemas = vim.tbl_deep_extend('force', new_config.settings.yaml.schemas or {}, require('schemastore').yaml.schemas())
+      end,
+      settings = {
+        redhat = { telemetry = { enabled = false } },
+        yaml = {
+          keyOrdering = false,
+          format = { enable = true },
+          validate = true,
+          schemaStore = {
+            enable = false,
+            url = '',
           },
         },
       },
-      yamlls = {
-        -- Have to add this for yamlls to understand that we support line folding
-        capabilities = {
-          textDocument = {
-            foldingRange = {
-              dynamicRegistration = false,
-              lineFoldingOnly = true,
-            },
-          },
-        },
-        -- lazy-load schemastore when needed
-        on_new_config = function(new_config)
-          new_config.settings.yaml.schemas = vim.tbl_deep_extend('force', new_config.settings.yaml.schemas or {}, require('schemastore').yaml.schemas())
-        end,
-        settings = {
-          redhat = { telemetry = { enabled = false } },
-          yaml = {
-            keyOrdering = false,
-            format = {
-              enable = true,
-            },
-            validate = true,
-            schemaStore = {
-              -- Must disable built-in schemaStore support to use
-              -- schemas from SchemaStore.nvim plugin
-              enable = false,
-              -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-              url = '',
-            },
-          },
+    })
+
+    vim.lsp.config('gitlab_ci_ls', {
+      cmd = { '/Users/ales/personal/gitlab-lsp/target/debug/gitlab-ci-ls' },
+      root_markers = { '.git', '.gitlab*' },
+      init_options = {
+        cache = '~/.cache/gitlab-ci-ls/',
+        log_path = '~/.cache/gitlab-ci-ls/log/gitlab-ci-ls.log',
+        options = {
+          dependencies_autocomplete_stage_filtering = false,
         },
       },
-      gitlab_ci_ls = {
-        cmd = { '/Users/ales/personal/gitlab-lsp/target/debug/gitlab-ci-ls' },
-        root_dir = util.root_pattern('.git', '.gitlab*'),
-        init_options = {
-          cache = '~/.cache/gitlab-ci-ls/',
-          log_path = '~/.cache/gitlab-ci-ls/log/gitlab-ci-ls.log',
-          options = {
-            dependencies_autocomplete_stage_filtering = false,
+    })
+
+    vim.lsp.config('gopls', {
+      settings = {
+        gopls = {
+          gofumpt = true,
+          codelenses = {
+            gc_details = false,
+            generate = true,
+            regenerate_cgo = true,
+            run_govulncheck = true,
+            test = true,
+            tidy = true,
+            upgrade_dependency = true,
+            vendor = true,
           },
+          hints = {
+            assignVariableTypes = true,
+            compositeLiteralFields = true,
+            compositeLiteralTypes = true,
+            constantValues = true,
+            functionTypeParameters = true,
+            parameterNames = true,
+            rangeVariableTypes = true,
+          },
+          analyses = {
+            fieldalignment = true,
+            nilness = true,
+            unusedparams = true,
+            unusedwrite = true,
+            useany = true,
+          },
+          usePlaceholders = true,
+          completeUnimported = true,
+          staticcheck = true,
+          directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
+          semanticTokens = true,
         },
       },
-      dockerls = {},
-      docker_compose_language_service = {},
-      helm_ls = {},
-      gopls = {
-        settings = {
-          gopls = {
-            gofumpt = true,
-            codelenses = {
-              gc_details = false,
-              generate = true,
-              regenerate_cgo = true,
-              run_govulncheck = true,
-              test = true,
-              tidy = true,
-              upgrade_dependency = true,
-              vendor = true,
-            },
-            hints = {
-              assignVariableTypes = true,
-              compositeLiteralFields = true,
-              compositeLiteralTypes = true,
-              constantValues = true,
-              functionTypeParameters = true,
-              parameterNames = true,
-              rangeVariableTypes = true,
-            },
-            analyses = {
-              fieldalignment = true,
-              nilness = true,
-              unusedparams = true,
-              unusedwrite = true,
-              useany = true,
-            },
-            usePlaceholders = true,
-            completeUnimported = true,
-            staticcheck = true,
-            directoryFilters = { '-.git', '-.vscode', '-.idea', '-.vscode-test', '-node_modules' },
-            semanticTokens = true,
+    })
+
+    vim.lsp.config('lua_ls', {
+      settings = {
+        Lua = {
+          completion = {
+            callSnippet = 'Replace',
           },
+          hint = { enable = true },
         },
       },
-      lua_ls = {
-        settings = {
-          Lua = {
-            completion = {
-              callSnippet = 'Replace',
-            },
-            hint = { enable = true },
-          },
-        },
-      },
-      angularls = {},
-      emmet_ls = {
-        filetypes = { 'html' },
-      },
-    }
+    })
+
+    vim.lsp.config('emmet_ls', {
+      filetypes = { 'html' },
+    })
 
     require('mason').setup()
-    --
-    local ensure_installed = vim.tbl_keys(servers or {})
-    vim.list_extend(ensure_installed, {
-      'stylua', -- Used to format Lua code
+
+    local ensure_installed = {
+      'stylua',
       'goimports',
       'gofumpt',
       'hadolint',
@@ -212,26 +200,28 @@ return {
       'codelldb',
       'gitlab-ci-ls',
       'vtsls',
-    })
+    }
 
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-    print 'WHAT'
     require('mason-lspconfig').setup {
-      ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+      ensure_installed = {},
       automatic_installation = true,
     }
 
-    local lspconfig = require 'lspconfig'
-    for name, config in pairs(servers) do
-      if config == true then
-        config = {}
-      end
-      config = vim.tbl_deep_extend('force', {}, {
-        capabilities = capabilities,
-      }, config)
-
-      lspconfig[name].setup(config)
-    end
+    vim.lsp.enable {
+      'taplo',
+      'marksman',
+      'jsonls',
+      'yamlls',
+      'gitlab_ci_ls',
+      'dockerls',
+      'docker_compose_language_service',
+      'helm_ls',
+      'gopls',
+      'lua_ls',
+      'angularls',
+      'emmet_ls',
+    }
   end,
 }

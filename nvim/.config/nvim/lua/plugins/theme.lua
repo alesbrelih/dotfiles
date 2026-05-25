@@ -1,10 +1,8 @@
 return {
   'catppuccin/nvim',
+  name = 'catppuccin',
   priority = 1000,
-  init = function()
-    vim.cmd.colorscheme 'catppuccin'
-  end,
-  config = function(_, _)
+  config = function()
     require('catppuccin').setup {
       flavour = 'frappe',
       integrations = {
@@ -42,8 +40,8 @@ return {
           },
         },
 
-        Special,
       },
     }
+    vim.cmd.colorscheme 'catppuccin-nvim'
   end,
 }
